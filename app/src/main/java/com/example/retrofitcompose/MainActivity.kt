@@ -18,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,6 +55,10 @@ fun MainScreen() {
 
     val BASE_URL = "https://raw.githubusercontent.com/"
 
+    var cryptoModels = remember {
+        mutableStateListOf<CryptoModel>()
+    }
+
     val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -68,9 +74,7 @@ fun MainScreen() {
         ) {
             if(response.isSuccessful){
                 response.body()?.let {
-                    it.forEach {
-                        println(it.currency)
-                    }
+                    cryptoModels.addAll(it)
                 }
             }
         }
@@ -101,6 +105,8 @@ fun MainScreen() {
                     .fillMaxSize()
                     .padding(paddingValues)
             )
+            CryptoList(cryptos = cryptoModels)
+
         }
     )
 }
@@ -118,15 +124,17 @@ fun CryptoList(cryptos : List<CryptoModel>){
 
 @Composable
 fun CryptoRow(crypto : CryptoModel){
-    Column(modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.surface)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(color = MaterialTheme.colorScheme.surface)) {
         Text(text = crypto.currency,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(2.dp),
             fontWeight = FontWeight.Bold
 
             )
         Text(text = crypto.price,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(2.dp),
 
             )
